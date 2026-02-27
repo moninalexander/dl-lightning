@@ -24,6 +24,7 @@ train_loader, TRAIN_SIZE, test_loader, TEST_SIZE, IM_SIZE, CH0, NUM_CLASSES = lo
 model = MNIST_CNN_21(CH0, IM_SIZE, CH1, CH2, NUM_CLASSES)
 best_model = MNIST_CNN_21(CH0, IM_SIZE, CH1, CH2, NUM_CLASSES)
 
+rich.print("\n[green]Model's summary\n")
 summary(model, depth=3, input_size = (BATCH_SIZE, CH0, IM_SIZE, IM_SIZE))
 
 J = nn.CrossEntropyLoss()
@@ -40,11 +41,10 @@ train_acc_history = []
 test_acc_history = []
 
 
-best_model.load_state_dict(torch.load('best_CNN.pt'))
+best_model.load_state_dict(torch.load('./projects/MNIST_CNN/best_CNN.pt'))
 with torch.no_grad():
     _, best_acc=train_eval_run('eval', TEST_SIZE, data_loader=test_loader, model=best_model, loss_fn=J)
-    rich.print(f"{'':<10}[green]{'Current best':<20}{best_acc:<15.4}")
-
+    rich.print(f"{'':<10}[green]{best_acc:<20.4}{'Current best':<20}")
 
 epochs = 20
 print("=" * 90)
@@ -59,9 +59,8 @@ for t in range(epochs):
 
     if test_acc > best_acc:
         best_acc = test_acc
-        torch.save(model.state_dict(),"best_CNN.pt")
+        torch.save(model.state_dict(),"./projects/MNIST_CNN/best_CNN.pt")
         rich.print(f"[green]{t:<10}{test_acc:<20.4f}{test_loss:<15.4f}{scheduler.get_last_lr()[-1]:<15.6f}{'Current best is updated':<20}")
-        # rich.print(f"{'':<10}[green]{best_acc:<20.4}{'':30}{'Current best is updated':<20}")
     else:
         print(f"{t:<10}{test_acc:<20.4f}{test_loss:<15.4f}{scheduler.get_last_lr()[-1]:<15.6f}")
 
